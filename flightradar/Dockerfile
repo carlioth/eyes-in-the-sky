@@ -1,18 +1,17 @@
 FROM alpine:3.7
 
-RUN apk add -U gpgme
-RUN gpg --keyserver pgp.mit.edu --recv-keys 40C430F5 && \
-    gpg --armor --export 40C430F5 | apt-key add -
-
-# Add APT repository to the config file, removing older entries if exist
-RUN mv /etc/apt/sources.list /etc/apt/sources.list.bak && \
-    grep -v flightradar24 /etc/apt/sources.list.bak > /etc/apt/sources.list && \
-    echo 'deb http://repo.feed.flightradar24.com flightradar24 raspberrypi-stable' >> /etc/apt/sources.list
-
-RUN apt-get update -y && apt-get install fr24feed -y
+RUN apk --no-cache add wget \
+  && mkdir /usr/lib/fr24/ \
+  && cd /tmp \
+  && wget http://feed.flightradar24.com/linux/fr24feed_1.0.18-5_amd64.tgz \
+  && tar zxf /tmp/fr24feed_1.0.18-5_amd64.tgz \
+  && cp fr24feed_amd64/fr24feed /usr/lib/fr24/ \
+  && rm -rf *
 
 COPY fr24feed.ini /etc/fr24feed.ini
 
+WORKDIR /usr/lib/fr24/
+
 EXPOSE 8754
 
-ENTRYPOINT ["/usr/bin/fr24feed"]
+ENTRYPOINT ["./fr24feed"]
