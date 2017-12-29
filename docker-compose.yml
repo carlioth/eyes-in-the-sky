@@ -23,7 +23,7 @@ services:
     depends_on:
       - dump1090
     restart: always
-    command: "--fr24key=abcdefghijklmnop --host=dump1090:30005"
+    command: "--fr24key=abcdefghijklmnop --host=dump1090:30005 --receiver=beast-tcp --raw=no --bs=no"
     # 8754 - HTTP server port
     ports:
     - "8754:8754"
