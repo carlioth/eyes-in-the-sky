@@ -1,0 +1,29 @@
+version: '3'
+services:
+  dump1090:
+    build: ./dump1090
+    image: dump1090:malcolm
+    # expose
+    # 30003 - TCP BaseStation output listen port
+    # 30004 - TCP Beast input listen port
+    # 30005 - TCP Beast output listen port
+    expose:
+      - "30003"
+      - "30004" 
+      - "30005"
+    restart: always
+    devices:
+      - "/dev/bus/usb"
+    ports:
+    - "8080:8080"
+
+  fr24feed:
+    build: ./flightradar
+    image: fr24feed:v1
+    depends_on:
+      - dump1090
+    restart: always
+    command: "--fr24key=abcdefghijklmnop --host=dump1090:30005"
+    # 8754 - HTTP server port
+    ports:
+    - "8754:8754"
